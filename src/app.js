@@ -17,16 +17,16 @@ app.get('/', (req,res) => {
 app.get("/products", async (req,res) => {
     const products = await productManager.getProducts();
     let {limit} = req.query;
-    let data;
+    let dataProd;
     if(limit) {
-        data = products.slice(0, parseInt(limit));
-        res.send(`Estos son los productos según límite: ${(JSON.stringify(data))}`);
+        dataProd = products.slice(0, parseInt(limit));
+        res.send(`Estos son los productos según límite: ${(JSON.stringify(dataProd))}`);
         
     } else {
-        data = products;
-        res.send(`Estos son todos los productos existentes: ${(JSON.stringify(data))}`);
+        dataProd = products;
+        res.send(`Estos son todos los productos existentes: ${(JSON.stringify(dataProd))}`);
     }
-    res.send(data)
+    res.send(dataProd)
     
 });
 
