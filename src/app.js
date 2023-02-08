@@ -33,7 +33,7 @@ app.get("/products", async (req,res) => {
 //Consulta de productos según id.
 app.get("/products/:id", async (req,res) => {
     try {
-        const product = await manager.getProductById(parseInt(req.params.id));
+        const product = await productManager.getProductById(parseInt(req.params.id));
         res.send(`El producto con ID ${product.id} es el siguiente: ${(JSON.stringify(product))}`);
     }
     catch {
