@@ -1,45 +1,36 @@
-import express  from "express";
-import ProductManager from "./ProductManager.js"
+import express from "express";
+import routerProduct from "./routes/products.routes.js";
+import routerCart from "./routes/cart.routes.js";
+import { __dirname } from "./path.js";
+import multer from 'multer';
 
-const app = express()
-const PORT = 8080
-const productManager = new ProductManager("./src/Products.json");
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json())
-
-app.get('/', (req,res) => {
-    res.send("Desafio #3 - Servidor con Express")
-})
-
-//Consulta de productos.
-
-app.get("/products", async (req,res) => {
-    const products = await productManager.getProducts();
-    let {limit} = req.query;
-    let dataProd;
-    if(limit) {
-        dataProd = products.slice(0, parseInt(limit));
-        res.send(`Estos son los productos según límite: ${(JSON.stringify(dataProd))}`);
-        
-    } else {
-        dataProd = products;
-        res.send(`Estos son todos los productos existentes: ${(JSON.stringify(dataProd))}`);
-    }
-    res.send(dataProd)
-    
-});
-
-//Consulta de productos según id.
-app.get("/products/:id", async (req,res) => {
-    try {
-        const product = await productManager.getProductById(parseInt(req.params.id));
-        res.send(`El producto con ID ${product.id} es el siguiente: ${(JSON.stringify(product))}`);
-    }
-    catch {
-        res.send("Producto inexistente")
+const storage = multer.diskStorage({
+    destination: (req,file,cb) => {
+        cb(null, 'src/public/img')
+    },
+    filename: (req,file,cb) => {
+        cb(null, `${file.originalname}`)
     }
 })
+
+const upload = multer({storage:storage});
+
+const app = express();
+const PORT = 8080;
+
+//Middlewares
+app.use(express.json()) ;
+app.use(express.urlencoded({extended: true}));
+
+//Routes
+app.use('/static', express.static(__dirname + '/public'))
+app.use('/api/products', routerProduct)
+app.use('/api/carts', routerCart)
+app.post('/upload',upload.single('product'), (req,res) => {
+    console.log(req.file)
+    res.send("Imagen subida")
+})
+
 
 app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`)

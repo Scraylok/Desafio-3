@@ -1,5 +1,5 @@
 import {promises as fs} from 'fs';
-const root = "./Products.json";
+
 
 
 class Product {
@@ -23,7 +23,7 @@ class Product {
     }
 }
 
-class ProductManager {
+export class ProductManager {
     constructor(path) {
         this.path = path;
     }
@@ -38,11 +38,11 @@ class ProductManager {
         } else if (Object.values(product).includes("") || Object.values(product).includes(null)) {
             return console.log("Todos los campos deben ser completados.");
         } else {
-            const nuevoProducto = {...product};
-            data.push(nuevoProducto);
+            const newProduct = {...product};
+            data.push(newProduct);
             await fs.writeFile(this.path, JSON.stringify(data), 'utf-8')
             
-            return console.log(`El producto con id: ${nuevoProducto.id} ha sido agregado.`)
+            return console.log(`El producto con id: ${newProduct.id} ha sido agregado.`)
         }
     }
 
@@ -97,4 +97,3 @@ class ProductManager {
             
     }
 }
-export default ProductManager;
