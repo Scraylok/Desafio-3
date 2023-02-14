@@ -34,7 +34,7 @@ class ProductManager {
         const prodCode = data.map((prod) => prod.code);
         const prodExist = prodCode.includes(product.code); 
         if (prodExist) {
-            return console.log (`El código ${product.code} ya existe. Ingrese uno diferente.`)
+            return (`El código ${product.code} ya existe. Ingrese uno diferente.`)
         } else if (Object.values(product).includes("") || Object.values(product).includes(null)) {
             return console.log("Todos los campos deben ser completados.");
         } else {
@@ -51,7 +51,7 @@ class ProductManager {
         const data = JSON.parse(read)
         if (data.length != 0) {
             console.log("Listado completo de productos:");
-            console.log(data);
+            return(data);
         } else {
             console.log ("No se encuentran productos en el listado.")
         }
@@ -63,9 +63,9 @@ class ProductManager {
         const findProduct = data.find((prod) => prod.id === id);
         if (findProduct) {
             console.log("Se ha encontrado el siguiente producto:")
-            return console.log(findProduct);
+            return (findProduct);
         } else {
-            return console.log("El producto no fue encontrado.");
+            return ("El producto no fue encontrado.");
         }
     }
 
@@ -77,7 +77,7 @@ class ProductManager {
         );
         const newData = data.filter((product) => product.id !== id);
         await fs.writeFile(this.path, JSON.stringify(newData), "utf-8");
-        return console.log(
+        return (
         `El producto ${productDeleted} ha sido eliminado.`
         );
     }
@@ -92,7 +92,7 @@ class ProductManager {
                 data[index][entry] = value;
                 await fs.writeFile(this.path, JSON.stringify(data, null, 2));
                 console.log("El producto se ha modificado:")
-                return console.log(data[index]);
+                return (data[index]);
             }
             
     }
