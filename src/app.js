@@ -36,7 +36,7 @@ io.on("connection", async (socket) => {
     console.log("Cliente conectado")
 
     socket.on("addProduct", async info => {//recibo informacion de mi cliente
-        socket.emit("msgAddProduct", await productManager.addProduct(info, ["/img/Remera-essentials-giant-logo.jpg"]))
+        socket.emit("msgAddProduct", await productManager.addProduct(info, ["/img/Buzo-the-best-adidas"]))
         socket.emit("getProducts", await productManager.getProducts())
     })
     
@@ -60,6 +60,9 @@ app.set('views', path.resolve(__dirname, './views'));
 app.use('/', express.static(__dirname + '/public'))
 app.use('/api/products', routerProduct)
 app.use('/api/carts', routerCart)
+app.get("/realtimeproducts", (req, res) => {
+  res.render("realtimeproducts");
+});
 app.use('/',routerSocket)
 /*app.post('/upload',upload.single('product'), (req,res) => {
     console.log(req.file)
