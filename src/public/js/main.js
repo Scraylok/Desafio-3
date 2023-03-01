@@ -1,83 +1,83 @@
-const socket = io.connect();
-const form = document.getElementById("formId");
-const productTitle = document.getElementById("title");
-const productDesc = document.getElementById("desc");
-const productPrice = document.getElementById("price");
-const productImg = document.getElementById("img");
-const productCode = document.getElementById("code");
-const productStock = document.getElementById("stock");
-const productCat = document.getElementById("cat");
-const btnDelete = document.getElementById("deleteAll");
+const socket = io()
 
-
-//Renderiza los productos del array dentro de la table-row
-function renderData(data) {
-  document.getElementById("products").innerHTML = "";
-  data.map((product) => {
-    document.getElementById("products").innerHTML += `
-      <tr>
-        <th scope="row"></th>
-        <td>${product.id}</td>
-        <td>${product.title}</td>
-        <td>${product.description}</td>
-        <td><img src="${product.img}"/></td>
-        <td>${product.price}</td>
-        <td>${product.code}</td>
-        <td>${product.stock}</td>
-        <td>${product.category}</td>
-        <td>${product.status}</td>
-        <td scope="col"><Button class="btn btn-danger" onclick="deleteProduct(${product.id})">Eliminar</Button></th>
-      </tr>
-    `;
-  });
-}
-//Elimina un producto, envia su id al servidor
-function deleteProduct(id) {
-  socket.emit("deleteProduct", id);
-}
-
-//Boton que elimina todos los producos, envia un array vacio al servidor
-btnDelete.addEventListener("click", () => {
-  socket.emit("deleteAllProducts", []);
-});
-
-
-//Recibo error del servidor por CODE de producto existente
-socket.on("error-message", error=>{
-  document.getElementById("errorCode").innerHTML = "*" + error
-})
-
-// Invoco la funcion renderData y le paso como parametro el array que recibo del servidor
-socket.on("array", (data) => {
-  renderData(data);
-});
-
+const addForm = document.getElementById("addProductForm")
+const deleteForm = document.getElementById("deleteProductForm")
 
 // Formulario para cargar producto
-form.addEventListener("submit", (e) => {
+
+addForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  if (productTitle.value &&  productDesc.value && productCode.value && productStock.value && productCat.value && productPrice.value) {
-    const newProduct = {
-      title: productTitle.value,
-      description: productDesc.value,
-      img: productImg.value,
-      price: productPrice.value,
-      code: productCode.value,
-      stock: productStock.value, 
-      category: productCat.value, 
-      status: "True"
-    };
-    productTitle.value = "";
-    productDesc.value = "";
-    productCode.value = "";
-    productStock.value = "";
-    productCat.value = "";
-    productImg.value = "";
-    productPrice.value = "";
-    socket.emit("product", newProduct);
+  const title = document.getElementById("title").value
+  const description = document.getElementById("description").value
+  const price = document.getElementById("price").value
+  const code = document.getElementById("code").value
+  const stock = document.getElementById("stock").value
+  const category = document.getElementById("category").value
+  const thumbnail = []
+  const product = {title,description,price,code,stock,category,thumbnail}
+  socket.emit("addProduct", product) //Enviar informacion a mi servidor
+})
+
+//Feedback del mensaje agregado
+
+socket.on("msgAddProduct", mensaje => {
+  Swal.fire({
+      icon: 'success',
+      title: `Producto agregado con el id: ${mensaje.id}`,
+      showConfirmButton: true,
+      timer: 2000
+  })
+  console.log(mensaje)
+})
+
+//Elimina un producto, envia su id al servidor
+
+deleteForm.addEventListener('submit', (e) => {
+  e.preventDefault()
+  const id = document.getElementById("prodId").value
+  socket.emit("deleteProduct", id)
+})
+//Feedback del producto eliminado
+
+socket.on("msgDeleteProduct", mesage => {
+  if (mesage) {
+      Swal.fire({
+          icon: 'success',
+          title: 'Producto eliminado',
+          showConfirmButton: true,
+          timer: 2000
+      })
   } else {
-    const error = document.getElementById("error");
-    error.innerHTML =
-      "*Debe completar todos los campos del formulario para agregar producto";
+      Swal.fire({
+          icon: 'error',
+          title: 'No se pudo eliminar el producto',
+          showConfirmButton: true,
+          timer: 2000
+      })
   }
-});
+  console.log(mesage)
+})
+
+
+
+
+socket.on("getProducts", products => {
+  const prodsFromServer = document.getElementById("productsFromServer")
+  prodsFromServer.innerHTML=""
+  
+  products.forEach(product => {
+      prodsFromServer.innerHTML += 
+      `
+      <div class="card col-sm-2 cardProduct">
+      <img class="card-img-top imgCardProducts" src="${product.thumbnail}">
+      <div class="card-body">
+      <h5 class="card-title">${product.title}</h5>
+          <p class="card-text">ID: ${product.id} </p>
+          <p class="card-text">${product.description} </p>
+          <p class="card-text">Precio: ${product.price} </p>       
+          <p class="card-text">Stock: ${product.stock} </p>   
+          <p class="card-text">Code: ${product.code} </p>
+      </div>
+      `
+  })
+})
